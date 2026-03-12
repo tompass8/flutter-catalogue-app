@@ -16,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Au lancement de la page, on lance le téléchargement des données
     futureCharacters = ApiService().fetchCharacters();
   }
 
@@ -55,6 +54,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         leading: Image.network(characters[index].image),
                         title: Text(characters[index].name),
                         subtitle: Text(characters[index].description),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/detail',
+                            arguments: characters[index],
+                          );
+                        },
                       );
                     },
                   );
@@ -68,13 +74,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     itemCount: characters.length,
                     itemBuilder: (context, index) {
-                      return Card(
-                        child: Column(
-                          children: [
-                            Expanded(child: Image.network(characters[index].image, fit: BoxFit.cover)),
-                            Text(characters[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            Text(characters[index].description),
-                          ],
+                      return InkWell(
+                        // 1. L'action au clic
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/detail',
+                            arguments: characters[index],
+                          );
+                        },
+                        // 2. L'enfant (la carte visuelle)
+                        child: Card(
+                          child: Column(
+                            children: [
+                              Expanded(child: Image.network(characters[index].image, fit: BoxFit.cover)),
+                              Text(characters[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              Text(characters[index].description),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -84,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
 
+          // 4. Si la liste est vide ou en cas de problème imprévu
           return const Center(child: Text('Aucune donnée'));
         },
       ),
