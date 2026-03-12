@@ -7,10 +7,17 @@ class DetailScreen extends StatelessWidget {
 
   const DetailScreen({super.key, required this.character});
 
-  Future<void> _launchAdultSwimUrl() async {
-    final Uri url = Uri.parse('https://gorickyourself.com/');
+  // Nouvelle fonction pour le Wiki
+  Future<void> _launchWikiUrl() async {
+    // 1. On remplace les espaces par des underscores (_)
+    String formattedName = character.name.replaceAll(' ', '_');
+
+    // 2. On injecte le nom formaté à la fin de l'URL de base
+    final Uri url = Uri.parse('https://rickandmorty.fandom.com/wiki/$formattedName');
+
+    // 3. On lance la page internet
     if (!await launchUrl(url)){
-      throw Exception('pistoportail en panne $url');
+      throw Exception('Impossible de charger la page $url');
     }
   }
 
@@ -25,7 +32,6 @@ class DetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
             Image.network(character.image, width: double.infinity, fit: BoxFit.cover),
             const SizedBox(height: 20),
             Text(
@@ -43,9 +49,12 @@ class DetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             ElevatedButton.icon(
-              onPressed: _launchAdultSwimUrl,
-              icon: const Icon(Icons.tv),
-              label: const Text('Voir sur Adult Swim'),
+              // On appelle notre nouvelle fonction
+              onPressed: _launchWikiUrl,
+              // J'ai mis une icône de livre (menu_book) au lieu de la TV
+              icon: const Icon(Icons.menu_book),
+              // On change le texte du bouton
+              label: const Text('Voir sur le Wiki Fandom'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.greenAccent,
                 foregroundColor: Colors.black,
