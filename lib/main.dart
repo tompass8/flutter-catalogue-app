@@ -3,6 +3,7 @@ import 'models/character.dart';
 import 'services/api_service.dart';
 import 'screens/character_detail.dart';
 import 'screens/dimensions_screen.dart';
+import 'screens/search_screen.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -95,13 +96,12 @@ class _RickAndMortyScreenState extends State<RickAndMortyScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // 5. LES 3 SOUS-ÉCRANS DE NOTRE APPLICATION
+
     final List<Widget> pages = [
-      _buildCatalogue(), // Index 0 : Ton catalogue
+      _buildCatalogue(), // Index 0 : Ton catalogue principal
+      const DimensionsScreen(), // Index 1 : Les dimensions
 
-      const DimensionsScreen(), // <--- C'EST ICI LA MAGIE ! On appelle ta nouvelle page !
-
-      const Center(child: Text('🔍 La page Personnages arrivera ici !', style: TextStyle(color: Colors.white, fontSize: 20))), // Index 2
+      const SearchScreen(), // <--- C'EST ICI LA MAGIE ! (L'Index 2)
     ];
 
     return Scaffold(

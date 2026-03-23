@@ -38,4 +38,22 @@ class ApiService {
       throw Exception('Erreur de connexion: $e');
     }
   }
+  Future<List<Character>> searchCharacters(String query) async {
+    try {
+      final response = await http.get(Uri.parse('$apiUrl/?name=$query'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final List<dynamic> results = data['results'];
+        return results.map((json) => Character.fromJson(json)).toList();
+      } else if (response.statusCode == 404) {
+        // L'API renvoie 404 si elle ne trouve personne (ex: si on tape "zdkfh")
+        return [];
+      } else {
+        throw Exception('Erreur de serveur: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Erreur de connexion: $e');
+    }
+  }
 }
