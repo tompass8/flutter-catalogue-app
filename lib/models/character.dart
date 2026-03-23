@@ -2,8 +2,8 @@ class Character {
   final int id;
   final String name;
   final String image;
-  final String description; // Correction : "description"
-  final String date;        // Correction : "String" avec un "n"
+  final String description;
+  final String date;
 
   final double latitude;
   final double longitude;
@@ -12,7 +12,7 @@ class Character {
     required this.id,
     required this.name,
     required this.image,
-    required this.description, // Correction : "description"
+    required this.description,
     required this.date,
     required this.latitude,
     required this.longitude,
@@ -25,7 +25,7 @@ class Character {
       image: json['image'] ?? '',
       description: "${json['species']} - ${json['status']}",
       date: json['created'] ?? '',
-      latitude: 43.6047, // Coordonnées fixes (ex: Toulouse) pour l'exercice
+      latitude: 43.6047, // Coordonnées fixes
       longitude: 1.4442,
     );
   }
