@@ -21,7 +21,35 @@ class _RickAndMortyScreenState extends State<RickAndMortyScreen> {
     });
   }
 
-  // Ton catalogue d'accueil
+  // Extrait le widget de la carte pour éviter la duplication de code
+  Widget _buildCharacterCard(BuildContext context, Character char) {
+    return Card(
+      color: const Color(0xFF1E2A4F),
+      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      elevation: 3,
+      child: Center(
+        child: ListTile(
+          leading: CircleAvatar(
+            radius: 25,
+            backgroundImage: NetworkImage(char.image),
+          ),
+          title: Text(char.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+          subtitle: Text(char.description, style: const TextStyle(color: Colors.white70)),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF97CE4C)),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CharacterDetailScreen(character: char),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Gère la récupération des données et l'affichage responsive
   Widget _buildCatalogue() {
     return FutureBuilder<List<Character>>(
       future: ApiService().fetchCharacters(),
@@ -32,32 +60,34 @@ class _RickAndMortyScreenState extends State<RickAndMortyScreen> {
           return Center(child: Text('Erreur: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
         } else if (snapshot.hasData) {
           final characters = snapshot.data!;
-          return ListView.builder(
-            itemCount: characters.length,
-            itemBuilder: (context, index) {
-              final char = characters[index];
-              return Card(
-                color: const Color(0xFF1E2A4F),
-                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                elevation: 3,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(char.image),
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              // Passage en GridView pour les tablettes ou écrans larges
+              if (constraints.maxWidth > 600) {
+                return GridView.builder(
+                  padding: const EdgeInsets.all(10),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 3 / 1,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                   ),
-                  title: Text(char.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-                  subtitle: Text(char.description, style: const TextStyle(color: Colors.white70)),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF97CE4C)),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CharacterDetailScreen(character: char),
-                      ),
-                    );
+                  itemCount: characters.length,
+                  itemBuilder: (context, index) {
+                    return _buildCharacterCard(context, characters[index]);
                   },
-                ),
-              );
+                );
+              }
+              // Affichage classique en ListView pour les smartphones
+              else {
+                return ListView.builder(
+                  itemCount: characters.length,
+                  itemBuilder: (context, index) {
+                    return _buildCharacterCard(context, characters[index]);
+                  },
+                );
+              }
             },
           );
         }
@@ -68,7 +98,7 @@ class _RickAndMortyScreenState extends State<RickAndMortyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Tes 3 onglets
+    // Gestion de la navigation entre les vues
     final List<Widget> pages = [
       _buildCatalogue(),
       const DimensionsScreen(),
