@@ -1,109 +1,103 @@
 import 'package:flutter/material.dart';
 import '../models/character.dart';
 import '../services/api_service.dart';
+import 'character_detail.dart';
+import 'dimensions_screen.dart';
+import 'search_screen.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class RickAndMortyScreen extends StatefulWidget {
+  const RickAndMortyScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<RickAndMortyScreen> createState() => _RickAndMortyScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  // On prépare notre appel à l'API
-  late Future<List<Character>> futureCharacters;
+class _RickAndMortyScreenState extends State<RickAndMortyScreen> {
+  int _selectedIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    futureCharacters = ApiService().fetchCharacters();
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  // Ton catalogue d'accueil
+  Widget _buildCatalogue() {
+    return FutureBuilder<List<Character>>(
+      future: ApiService().fetchCharacters(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF97CE4C)));
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Erreur: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+        } else if (snapshot.hasData) {
+          final characters = snapshot.data!;
+          return ListView.builder(
+            itemCount: characters.length,
+            itemBuilder: (context, index) {
+              final char = characters[index];
+              return Card(
+                color: const Color(0xFF1E2A4F),
+                margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                elevation: 3,
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 25,
+                    backgroundImage: NetworkImage(char.image),
+                  ),
+                  title: Text(char.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+                  subtitle: Text(char.description, style: const TextStyle(color: Colors.white70)),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF97CE4C)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CharacterDetailScreen(character: char),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          );
+        }
+        return const Center(child: Text('Aucun personnage trouvé.', style: TextStyle(color: Colors.white)));
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Tes 3 onglets
+    final List<Widget> pages = [
+      _buildCatalogue(),
+      const DimensionsScreen(),
+      const SearchScreen(),
+    ];
+
     return Scaffold(
+      backgroundColor: const Color(0xFF24325F),
       appBar: AppBar(
-        title: const Text('Catalogue Rick & Morty'),
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: const Color(0xFF97CE4C),
+        title: const Text(
+          'Rick & Morty Dex',
+          style: TextStyle(fontFamily: 'GetSchwifty', fontSize: 32, color: Colors.black),
+        ),
+        centerTitle: true,
+        elevation: 5,
       ),
-      // FutureBuilder attend que les données d'internet arrivent pour construire l'écran
-      body: FutureBuilder<List<Character>>(
-        future: futureCharacters,
-        builder: (context, snapshot) {
-          // 1. Si ça charge, on montre un rond qui tourne
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          // 2. S'il y a une erreur internet
-          else if (snapshot.hasError) {
-            return Center(child: Text('Erreur: ${snapshot.error}'));
-          }
-          // 3. Si les données sont bien là !
-          else if (snapshot.hasData) {
-            List<Character> characters = snapshot.data!;
-
-            // C'EST ICI QU'ON GÈRE LE RESPONSIVE (Mobile vs Tablette)
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                // Si l'écran est petit (Mobile) : on retourne une Liste classique
-                if (constraints.maxWidth < 600) {
-                  return ListView.builder(
-                    itemCount: characters.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Image.network(characters[index].image),
-                        title: Text(characters[index].name),
-                        subtitle: Text(characters[index].description),
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/detail',
-                            arguments: characters[index],
-                          );
-                        },
-                      );
-                    },
-                  );
-                }
-                // Si l'écran est grand (Tablette) : on retourne une Grille
-                else {
-                  return GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // 3 colonnes sur tablette
-                      childAspectRatio: 0.8,
-                    ),
-                    itemCount: characters.length,
-                    itemBuilder: (context, index) {
-                      return InkWell(
-                        // 1. L'action au clic
-                        onTap: () {
-                          Navigator.pushNamed(
-                            context,
-                            '/detail',
-                            arguments: characters[index],
-                          );
-                        },
-                        // 2. L'enfant (la carte visuelle)
-                        child: Card(
-                          child: Column(
-                            children: [
-                              Expanded(child: Image.network(characters[index].image, fit: BoxFit.cover)),
-                              Text(characters[index].name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                              Text(characters[index].description),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
-            );
-          }
-
-          // 4. Si la liste est vide ou en cas de problème imprévu
-          return const Center(child: Text('Aucune donnée'));
-        },
+      body: pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF24325F),
+        selectedItemColor: const Color(0xFF97CE4C),
+        unselectedItemColor: Colors.white54,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+          BottomNavigationBarItem(icon: Icon(Icons.public), label: 'Dimensions'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Recherche'),
+        ],
       ),
     );
   }
