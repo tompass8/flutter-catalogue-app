@@ -1,17 +1,22 @@
-# flutter_catalogue_app
+# 🛸 Rick & Morty Dex
 
-A new Flutter project.
+Une application mobile développée en Flutter permettant d'explorer l'univers et le multivers de Rick & Morty !
 
-## Getting Started
+##  Fonctionnalités
+- **Catalogue de Personnages** : Liste dynamique récupérée depuis l'API.
+- **Dimensions & Planètes** : Exploration des différents lieux (Terre C-137, Citadelle, etc.).
+- **Recherche intégrée** : Trouvez facilement n'importe quelle variante de personnage.
+- **Portail Wiki** : Intégration de `url_launcher` pour ouvrir directement les fiches détaillées sur le Wiki Fandom.
 
-This project is a starting point for a Flutter application.
+## Technologies utilisées
+- **Framework** : [Flutter](https://flutter.dev/) (Dart)
+- **Architecture** : Découpage propre (Models, Screens, Services)
+- **API Rest** : [The Rick and Morty API](https://rickandmortyapi.com/)
+- **Packages externes** :
+    - `http` (Gestion des requêtes réseau)
+    - `url_launcher` (Redirection vers le navigateur web)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+##  Comment lancer le projet sur votre machine
+1. Clonez ce dépôt :
+   ```bash
+   git clone [https://github.com/tompass8/flutter-catalogue-app.git)
